@@ -3,8 +3,8 @@
 // ======================
 
 // Safe to expose. anon key is public by design.
-export const SUPABASE_URL = "https://YOUR_PROJECT_ID.supabase.co";
-export const SUPABASE_ANON_KEY = "YOUR_PUBLIC_ANON_KEY";
+export const SUPABASE_URL = "https://tjtttqnamgiimqfhfaai.supabase.co";
+export const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdHR0cW5hbWdpaW1xZmhmYWFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM3NDQ5MzUsImV4cCI6MjA3OTMyMDkzNX0.ygj-xYwdJIMMrvvdmqxkHvvCI7eVUiE9AYcNlSakHzM";
 
 
 // =======================
