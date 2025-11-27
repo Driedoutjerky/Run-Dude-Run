@@ -90,15 +90,20 @@ export default class MenuScene extends Phaser.Scene {
             await this.refreshLeaderboard();
         });
     }
-
+    /**
+     * Fetch top scores from the leaderboard.
+     * @param {number} limit - Number of entries to return.
+     */
     async refreshLeaderboard(limit = 20) {
-        // clear the prior text
+        // Clear prior text
         if (this.leaderboardTexts) {
             this.leaderboardTexts.forEach(t => t.destroy());
         }
         this.leaderboardTexts = [];
 
-        // Get al session results from database ordered by score descending
+        const playerId = getPlayerId(); // ← 내 UUID 가져오기
+
+        // Load all session records from Supabase ordered by scores descending
         const { data, error } = await supabase
             .from("game_sessions")
             .select(`
@@ -113,7 +118,7 @@ export default class MenuScene extends Phaser.Scene {
             return;
         }
 
-        // 1) Based on player_id, only maintain the highest score
+        // 1) Ensure only the highest score of each player remain
         const unique = [];
         const seen = new Set();
 
@@ -124,23 +129,55 @@ export default class MenuScene extends Phaser.Scene {
             }
         }
 
-        // 2) Only show Top 20 scores
+        // 2) Only user Top N Records
         const top = unique.slice(0, limit);
 
-        // 3) indicate in the UI
+        // 3) Medal Icon
+        const medals = ["🥇", "🥈", "🥉"]; // Top 3
+
+        // 4) print leaderboard
         top.forEach((row, i) => {
             const nickname = row.players?.nickname || "Unknown";
             const score = row.score;
 
+            // indicate medal or number of the place
+            const rankLabel = i < 3 ? medals[i] : `${i + 1}.`;
+
+            // basic
+            const style = {
+                fontSize: "20px",
+                fill: "#ffffff"
+            };
+
+            // if the information is from the current session
+            const isMe = row.player_id === playerId;
+            if (isMe) {
+                style.fill = "#ffff00"; // yellow
+            }
+
             const text = this.add.text(
                 350,
-                160 + i * 24,
-                `${i + 1}. ${nickname} — ${score}`,
-                {
-                    fontSize: "20px",
-                    fill: "#ffffff"
-                }
+                160 + i * 28,
+                `${rankLabel} ${nickname} — ${score}`,
+                style
             );
+
+            // highlight the background
+            if (isMe) {
+                const bg = this.add.rectangle(
+                    350 - 10,
+                    160 + i * 28 + 10,
+                    330,
+                    26,
+                    0xffff00,
+                    0.25
+                ).setOrigin(0, 0.5);
+
+                // set text depth on the top
+                text.setDepth(1);
+
+                this.leaderboardTexts.push(bg);
+            }
 
             this.leaderboardTexts.push(text);
         });
